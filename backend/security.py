@@ -8,7 +8,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from pydantic import ValidationError
-from secure import SecureHeaders
+from secure_headers.headers import SecureHeaders  # 修正: secure パッケージを secure_headers.headers に変更
 
 # 1. パスワード保護: 強力なハッシュ化コンテキスト
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
