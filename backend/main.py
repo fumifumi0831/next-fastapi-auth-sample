@@ -33,8 +33,26 @@ app.add_middleware(
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
-    # ダミーセキュリティヘッダーはエラーを発生させないが実際には何もしない
+    
+    # XSS対策のためのセキュリティヘッダーを設定
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    
+    # CSRF対策としてレスポンスが変更されないようにするヘッダー
+    response.headers["Cache-Control"] = "no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    
+    # IEで自動的にMIMEスニッフィングを行わないように設定
+    response.headers["X-Download-Options"] = "noopen"
+    
+    # クリックジャッキング対策
+    response.headers["X-Frame-Options"] = "DENY"
+    
+    # もともとのsecure_headersの処理も実行（現在はダミー）
     secure_headers.framework.fastapi(response)
+    
     return response
 
 # データベース初期化
