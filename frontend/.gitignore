@@ -1,0 +1,21 @@
+# ビルド成果物
+/build/
+/dist/
+*.class
+*.jar
+
+# ログファイル
+*.log
+
+# 一時ファイル
+*.tmp
+.DS_Store
+
+# 設定ファイル
+.env
+config.local.js
+
+# 依存関係ディレクトリ
+/node_modules/
+/vendor/
+/.next/
