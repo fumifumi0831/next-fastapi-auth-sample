@@ -33,6 +33,7 @@ app.add_middleware(
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
+    # ダミーセキュリティヘッダーはエラーを発生させないが実際には何もしない
     secure_headers.framework.fastapi(response)
     return response
 
@@ -100,8 +101,15 @@ def login(
     # ユーザー検索
     user = db.query(User).filter(User.email == login_data.email).first()
     
+    # ユーザーが見つからない場合のエラーハンドリング
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="メールアドレスまたはパスワードが間違っています"
+        )
+    
     # ユーザー認証
-    if not user or not SecurityManager.verify_password(login_data.password, user.hashed_password):
+    if not SecurityManager.verify_password(login_data.password, user.hashed_password):
         # ログイン失敗時の処理
         user.login_attempts = (user.login_attempts or 0) + 1
         
